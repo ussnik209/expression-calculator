@@ -1,3 +1,11 @@
+function UserExeption(message) {
+    this.message = message
+    // this.toString = function() {
+    //     return this.name + ': ' + this.message
+    // }
+
+}
+
 function eval(a, b, operation) {
     a = Number(a)
     b = Number(b)
@@ -13,6 +21,8 @@ function eval(a, b, operation) {
             res = a * b
             break
         case '/':
+            if (b == 0) throw new UserExeption('TypeError: Division by zero.')
+            
             res = a / b
             break
     }
@@ -22,11 +32,14 @@ function eval(a, b, operation) {
 function expressionCalculator(expr) {
     const operations = ['*', '/', '+', '-']
     expr = expr.replace(/ /g, '')
-    exprArr = expr.split('')
-    let exprRes = 0
-    let i = 0
-    console.log(expr);
+    exprArr = expr.replace(/[0-9]{1,3}/g, '$& ')
+              .replace(/[\+\-\*\/\(\)]{1}/g, '$& ')
+              .split(' ')
+              .slice(0, -1)
+    console.log(exprArr);
+
     exprArr = calculateOper(exprArr, operations.slice(0, 2))
+
     exprArr = calculateOper(exprArr, operations.slice(2))
     console.log(exprArr);
     return exprArr[0]
@@ -58,7 +71,7 @@ function calculateOper(arr, operations) {
     return arr
 }
 
-console.log(expressionCalculator('2*3'));
+// console.log(expressionCalculator('24/0*(34+1)*23()'));
 
 module.exports = {
     expressionCalculator
