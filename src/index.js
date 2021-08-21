@@ -11,7 +11,7 @@ function eval(a, b, operation) {
     b = Number(b)
     let res = 0
     switch (operation) {
-        case '+': 
+        case '+':
             res = a + b
             break
         case '-':
@@ -22,7 +22,7 @@ function eval(a, b, operation) {
             break
         case '/':
             if (b == 0) throw new UserExeption('TypeError: Division by zero.')
-            
+
             res = a / b
             break
     }
@@ -31,17 +31,54 @@ function eval(a, b, operation) {
 
 function expressionCalculator(expr) {
     const operations = ['*', '/', '+', '-']
+
     expr = expr.replace(/ /g, '')
+
     exprArr = expr.replace(/[0-9]{1,3}/g, '$& ')
-              .replace(/[\+\-\*\/\(\)]{1}/g, '$& ')
-              .split(' ')
-              .slice(0, -1)
+        .replace(/[\+\-\*\/\(\)]{1}/g, '$& ')
+        .split(' ')
+        .slice(0, -1)
+
     console.log(exprArr);
+
+
+    let openedBrackets = []
+    let closedBrackets = []
+    for (let i = 0, len = exprArr.length; i < len; i++) {
+        const el = exprArr[i]
+        if (el == '(') {
+            openedBrackets.push(i)
+        } else {
+            if (el == ')') {
+                closedBrackets.push(i)
+            }
+        }
+    }
+
+    if (openedBrackets.length != closedBrackets.length) {
+        throw new Error('ExpressionError: Brackets must be paired')
+    }
+
+    while (openedBrackets.length > 0) {
+        const opened = openedBrackets.pop()
+
+        const closed = closedBrackets.splice(
+            closedBrackets.findIndex(closed => closed > opened),
+            1
+        )[0]
+
+        let innerBrackets = exprArr.slice(opened + 1, closed)
+        innerBrackets = calculateOper(innerBrackets, operations.slice(0, 2))
+        innerBrackets = calculateOper(innerBrackets, operations.slice(2))
+        exprArr.splice(opened, closed - opened, innerBrackets[0])
+        console.log('innerBrackets: ' + innerBrackets);
+        console.log(openedBrackets.length + ': ' + exprArr);
+    }
 
     exprArr = calculateOper(exprArr, operations.slice(0, 2))
 
     exprArr = calculateOper(exprArr, operations.slice(2))
-    console.log(exprArr);
+    // console.log(exprArr);
     return exprArr[0]
 }
 
@@ -71,7 +108,7 @@ function calculateOper(arr, operations) {
     return arr
 }
 
-// console.log(expressionCalculator('24/0*(34+1)*23()'));
+// console.log(expressionCalculator('77 + 79 / 25 * (  64 * 63 - 89 * 14  ) * 49'));
 
 module.exports = {
     expressionCalculator
