@@ -1,15 +1,8 @@
-function UserExeption(message) {
-    this.message = message
-    // this.toString = function() {
-    //     return this.name + ': ' + this.message
-    // }
-
-}
-
 function eval(a, b, operation) {
     a = Number(a)
     b = Number(b)
     let res = 0
+
     switch (operation) {
         case '+':
             res = a + b
@@ -21,11 +14,12 @@ function eval(a, b, operation) {
             res = a * b
             break
         case '/':
-            if (b == 0) throw new UserExeption('TypeError: Division by zero.')
+            if (b == 0) throw new Error('TypeError: Division by zero.')
 
             res = a / b
             break
     }
+
     return res;
 }
 
@@ -38,9 +32,6 @@ function expressionCalculator(expr) {
         .replace(/[\+\-\*\/\(\)]{1}/g, '$& ')
         .split(' ')
         .slice(0, -1)
-
-    console.log(exprArr);
-
 
     let openedBrackets = []
     let closedBrackets = []
@@ -61,24 +52,20 @@ function expressionCalculator(expr) {
 
     while (openedBrackets.length > 0) {
         const opened = openedBrackets.pop()
-
-        const closed = closedBrackets.splice(
-            closedBrackets.findIndex(closed => closed > opened),
-            1
-        )[0]
-
+        const closed = exprArr.findIndex(
+            (el, i) => el == ')' && i > opened
+        )
+  
         let innerBrackets = exprArr.slice(opened + 1, closed)
+
         innerBrackets = calculateOper(innerBrackets, operations.slice(0, 2))
         innerBrackets = calculateOper(innerBrackets, operations.slice(2))
-        exprArr.splice(opened, closed - opened, innerBrackets[0])
-        console.log('innerBrackets: ' + innerBrackets);
-        console.log(openedBrackets.length + ': ' + exprArr);
+        exprArr.splice(opened, closed - opened + 1, innerBrackets[0])
     }
 
     exprArr = calculateOper(exprArr, operations.slice(0, 2))
-
     exprArr = calculateOper(exprArr, operations.slice(2))
-    // console.log(exprArr);
+
     return exprArr[0]
 }
 
@@ -101,14 +88,13 @@ function calculateOper(arr, operations) {
                 return arr
             }
             i--
+
         }
         i++
 
     }
     return arr
 }
-
-// console.log(expressionCalculator('77 + 79 / 25 * (  64 * 63 - 89 * 14  ) * 49'));
 
 module.exports = {
     expressionCalculator
